@@ -1,5 +1,5 @@
 import React from "react";
-import * as Tone from 'tone';
+import * as Tone from "tone";
 import styled from "styled-components";
 
 const keys = [
@@ -69,7 +69,7 @@ const PianoComponent = () => {
             </WhiteKey>
           );
         } else {
-          const leftOffset = (index * 60) - 20;
+          const leftOffset = index * 60 - 20;
           return (
             <BlackKey
               key={index}
