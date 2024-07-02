@@ -1,22 +1,6 @@
-import React from "react";
-import * as Tone from "tone";
 import styled from "styled-components";
-
-const keys = [
-  { note: "C4", type: "white" },
-  { note: "C#4", type: "black" },
-  { note: "D4", type: "white" },
-  { note: "D#4", type: "black" },
-  { note: "E4", type: "white" },
-  { note: "F4", type: "white" },
-  { note: "F#4", type: "black" },
-  { note: "G4", type: "white" },
-  { note: "G#4", type: "black" },
-  { note: "A4", type: "white" },
-  { note: "A#4", type: "black" },
-  { note: "B4", type: "white" },
-  { note: "C5", type: "white" },
-];
+import * as Tone from "tone";
+import React from "react";
 
 const PianoContainer = styled.div`
   display: flex;
@@ -25,62 +9,98 @@ const PianoContainer = styled.div`
   width: fit-content;
 `;
 
-const WhiteKey = styled.div`
-  width: 90px;
+const Key = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: ${(props) => (props.isBlack ? "#90" : "#f0f0f0")};
+  }
+`;
+
+const WhiteKey = styled(Key)`
+  width: 75px;
   height: 400px;
   background-color: white;
   border: 1px solid black;
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  cursor: pointer;
 `;
 
-const BlackKey = styled.div`
-  width: 60px;
+const BlackKey = styled(Key)`
+  width: 50px;
   height: 250px;
+  color: white;
+  borderl: 1px solid black;
   background-color: black;
-  border: 1px solid black;
   position: absolute;
-  left: ${(props) => props.leftOffset}px;
+  left: ${(props) => props.$leftOffset}px;
+  top: 0;
   z-index: 2;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  cursor: pointer;
 `;
+
+const whiteKeys = ["C", "D", "E", "F", "G", "A", "B"];
+const blackKeys = ["C#", "D#", "", "F#", "G#", "A#", "", ""];
+const noteMapping = [
+  "C4",
+  "D4",
+  "E4",
+  "F4",
+  "G4",
+  "A4",
+  "B4",
+  "C#4",
+  "D#4",
+  "",
+  "F#4",
+  "G#4",
+  "A#4",
+];
+
+const getBlackKeyOffset = (index) => {
+  switch (index) {
+    case 0:
+    case 1:
+    case 3:
+    case 4:
+    case 5:
+      return 50;
+    default:
+      return 0;
+  }
+};
 
 const PianoComponent = () => {
   const synth = new Tone.Synth().toDestination();
 
-  const playNote = (note) => {
+  const playNote = async (note) => {
+    await Tone.start();
     synth.triggerAttackRelease(note, "8n");
   };
 
   return (
     <PianoContainer>
-      {keys.map((key, index) => {
-        if (key.type === "white") {
-          return (
-            <WhiteKey key={index} onMouseDown={() => playNote(key.note)}>
-              {key.note}
-            </WhiteKey>
-          );
-        } else {
-          const leftOffset = index * 60 - 20;
-          return (
+      {whiteKeys.map((key, index) => (
+        <div key={index} style={{ position: "relative" }}>
+          <WhiteKey onMouseDown={() => playNote(noteMapping[index])}>
+            {key}
+          </WhiteKey>
+          {blackKeys[index] && (
             <BlackKey
               key={index}
-              leftOffset={leftOffset}
-              onMouseDown={() => playNote(key.note)}
+              $leftOffset={getBlackKeyOffset(index)}
+              onMouseDown={() =>
+                playNote(noteMapping[index + whiteKeys.length])
+              }
             >
-              {key.note}
+              {blackKeys[index]}
             </BlackKey>
-          );
-        }
-      })}
+          )}
+        </div>
+      ))}
     </PianoContainer>
   );
 };
