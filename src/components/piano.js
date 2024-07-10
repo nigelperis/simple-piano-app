@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import * as Tone from "tone";
-import React from "react";
+import React, { useEffect } from "react";
 
 const PianoContainer = styled.div`
   display: flex;
@@ -34,7 +34,7 @@ const BlackKey = styled(Key)`
   width: 50px;
   height: 250px;
   color: white;
-  borderl: 1px solid black;
+  border: 1px solid black;
   background-color: black;
   position: absolute;
   left: ${(props) => props.$leftOffset}px;
@@ -59,6 +59,8 @@ const noteMapping = [
   "G#4",
   "A#4",
 ];
+const whiteKeyMappings = ["a", "s", "d", "f", "g", "h", "j"];
+const blackKeyMappings = ["w", "e", "", "t", "y", "u", "", ""];
 
 const getBlackKeyOffset = (index) => {
   switch (index) {
@@ -81,6 +83,25 @@ const PianoComponent = () => {
     synth.triggerAttackRelease(note, "8n");
   };
 
+  const handleKeyDown = (event) => {
+    const key = event.key.toLowerCase();
+    const whiteKeyIndex = whiteKeyMappings.indexOf(key);
+    const blackKeyIndex = blackKeyMappings.indexOf(key);
+
+    if (whiteKeyIndex !== -1) {
+      playNote(noteMapping[whiteKeyIndex]);
+    } else if (blackKeyIndex !== -1) {
+      playNote(noteMapping[blackKeyIndex + whiteKeys.length]);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <PianoContainer>
       {whiteKeys.map((key, index) => (
@@ -90,7 +111,7 @@ const PianoComponent = () => {
           </WhiteKey>
           {blackKeys[index] && (
             <BlackKey
-              key={index}
+              key={`black-${index}`}
               $leftOffset={getBlackKeyOffset(index)}
               onMouseDown={() =>
                 playNote(noteMapping[index + whiteKeys.length])
