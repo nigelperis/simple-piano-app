@@ -2,7 +2,7 @@ import React from "react";
 import GlobalStyles from "./styles/GlobalStyles";
 import PianoComponent from "./components/piano";
 
-function App() {
+function MyApp() {
   return (
     <>
       <GlobalStyles />
@@ -13,4 +13,4 @@ function App() {
   );
 }
 
-export default App;
+export default MyApp;
